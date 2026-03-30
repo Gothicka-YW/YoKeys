@@ -54,6 +54,26 @@
           </div>
         </div>
 
+        <div class="saved-keys">
+          <label for="key-name">Save this key with a name</label>
+          <div class="row">
+            <input
+              id="key-name"
+              type="text"
+              placeholder="Example: Pixies Forest"
+              maxlength="60"
+              autocomplete="off"
+            />
+            <button id="btn-save-key" class="btn" type="button">Save Key</button>
+          </div>
+
+          <div class="saved-header-row">
+            <span class="saved-title">Saved Keys</span>
+            <button id="btn-clear-saved" class="btn btn-small" type="button">Clear Saved</button>
+          </div>
+          <ul id="saved-list" class="saved-list" aria-live="polite"></ul>
+        </div>
+
         <div class="actions">
           <button id="btn-clear" class="btn" type="button">Clear</button>
         </div>

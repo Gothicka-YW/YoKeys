@@ -24,6 +24,8 @@ This input is used only to generate the canonical output link.
 
 If you enable the "Remember my last Home ID" option, YoKeys stores the last parsed Home ID in your browser's localStorage so it can be prefilled later.
 
+If you use the saved keys section, YoKeys also stores the names and normalized links you choose to save in localStorage.
+
 - Stored locally on your device/browser only
 - Not transmitted to a server by YoKeys
 - You can clear it at any time by unchecking the remember option and/or clearing browser site data

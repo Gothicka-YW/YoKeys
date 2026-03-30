@@ -168,6 +168,76 @@ textarea {
   background: rgba(255, 252, 246, 0.8);
 }
 
+.saved-keys {
+  margin-top: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px;
+  background: rgba(255, 252, 246, 0.85);
+}
+
+.saved-header-row {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.saved-title {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.btn-small {
+  padding: 7px 10px;
+  font-size: 12px;
+}
+
+.saved-list {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.saved-item {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.saved-item-name {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.saved-item-link {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.saved-item-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.saved-empty {
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  padding: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
 .actions {
   margin-top: 14px;
 }
@@ -258,6 +328,11 @@ textarea {
 
   .row {
     grid-template-columns: 1fr;
+  }
+
+  .saved-header-row {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .btn {
