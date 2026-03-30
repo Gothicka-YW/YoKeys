@@ -158,6 +158,10 @@
     const apLivingMatch = raw.match(/[?&]d=APLiving-(\d+)/i) || raw.match(/d=APLiving-(\d+)/i);
     if (apLivingMatch && apLivingMatch[1]) return apLivingMatch[1];
 
+    // Support links like d=c6065990 (club rooms)
+    const cMatch = raw.match(/[?&]d=(c\d+)/i) || raw.match(/d=(c\d+)/i);
+    if (cMatch && cMatch[1]) return cMatch[1];
+
     // Fallback for pasted fragments like d=h123456 or ...?d=h123456
     const queryMatch = raw.match(/[?&]d=h(\d+)/i) || raw.match(/d=h(\d+)/i);
     if (queryMatch && queryMatch[1]) return queryMatch[1];
@@ -178,9 +182,12 @@
     // Check if input contains APLiving format to use correct prefix
     const input = homeInput.value.trim();
     const isAPLiving = /d=APLiving-/i.test(input);
+    const isClub = /d=c\d+/i.test(input);
     
     const canonical = isAPLiving 
       ? "https://yoworld.com/?d=APLiving-" + homeId
+      : isClub
+      ? "https://yoworld.com/?d=" + homeId
       : CANONICAL_BASE + homeId;
 
     outLink.value = canonical;
