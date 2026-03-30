@@ -4,19 +4,14 @@
   const CANONICAL_BASE = "https://yoworld.com/?d=h";
 
   const homeInput = document.getElementById("home-input");
-  const imageUrlInput = document.getElementById("img-url");
   const rememberInput = document.getElementById("remember");
   const statusEl = document.getElementById("status");
 
   const outLink = document.getElementById("out-link");
-  const outBb = document.getElementById("out-bb");
-  const outSig = document.getElementById("out-signature");
 
   const btnNormalize = document.getElementById("btn-normalize");
   const btnClear = document.getElementById("btn-clear");
   const btnCopyLink = document.getElementById("copy-link");
-  const btnCopyBb = document.getElementById("copy-bb");
-  const btnCopySig = document.getElementById("copy-signature");
 
   function setStatus(message, type) {
     statusEl.textContent = message || "";
@@ -26,8 +21,6 @@
 
   function clearOutputs() {
     outLink.value = "";
-    outBb.value = "";
-    outSig.value = "";
   }
 
   function extractHomeId(input) {
@@ -66,15 +59,8 @@
     }
 
     const canonical = CANONICAL_BASE + homeId;
-    const bbcode = "[url=" + canonical + "]YOUR_TEXT_OR_IMAGE[/url]";
-    const img = (imageUrlInput.value || "").trim();
-    const signature = img
-      ? "[url=" + canonical + "][img]" + img + "[/img][/url]"
-      : "[url=" + canonical + "][img]IMAGE_URL_HERE[/img][/url]";
 
     outLink.value = canonical;
-    outBb.value = bbcode;
-    outSig.value = signature;
 
     if (rememberInput.checked) {
       localStorage.setItem(KEY_ID, homeId);
@@ -124,23 +110,13 @@
   homeInput.addEventListener("keydown", function (e) {
     if (e.key === "Enter") buildOutputs();
   });
-  imageUrlInput.addEventListener("input", function () {
-    if (outLink.value) buildOutputs();
-  });
 
   btnCopyLink.addEventListener("click", function () {
     copyText(outLink.value, "Canonical link copied.");
   });
-  btnCopyBb.addEventListener("click", function () {
-    copyText(outBb.value, "BBCode copied.");
-  });
-  btnCopySig.addEventListener("click", function () {
-    copyText(outSig.value, "Signature code copied.");
-  });
 
   btnClear.addEventListener("click", function () {
     homeInput.value = "";
-    imageUrlInput.value = "";
     clearOutputs();
     setStatus("Cleared.", "ok");
     if (!rememberInput.checked) {

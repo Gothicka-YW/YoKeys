@@ -1,6 +1,6 @@
 # YoKeys (GitHub Pages)
 
-Standalone web widget that normalizes YoWorld home links and generates BBCode.
+Standalone web widget that normalizes YoWorld home links.
 
 ## Canonical Output
 
@@ -13,11 +13,8 @@ https://yoworld.com/?d=hHOME_ID
 - Accepts Home ID only, old `index.php?d=h...`, or new `?d=h...` URLs.
 - Accepts legacy Facebook layout links like `https://apps.facebook.com/playyoworld/?d=h108837847`.
 - Normalizes to a single canonical link format.
-- Generates:
-  - Canonical link
-  - BBCode wrapper
-  - Full signature BBCode with optional image URL
-- Copy buttons for each output.
+- Shows one canonical output labeled **Here are your keys!**
+- Includes one-click copy for the canonical link.
 - Optional remember-last-ID toggle using localStorage.
 
 ## Files
