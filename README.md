@@ -22,6 +22,11 @@ https://yoworld.com/?d=hHOME_ID
 - `index.html`
 - `style.css`
 - `script.js`
+- `PRIVACY_POLICY.md`
+
+## Privacy Policy
+
+See `PRIVACY_POLICY.md`.
 
 ## Quick Local Preview
 
