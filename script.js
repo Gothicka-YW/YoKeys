@@ -151,7 +151,13 @@
       return;
     }
 
-    const canonical = CANONICAL_BASE + homeId;
+    // Check if input contains APLiving format to use correct prefix
+    const input = homeInput.value.trim();
+    const isAPLiving = /d=APLiving-/i.test(input);
+    
+    const canonical = isAPLiving 
+      ? "https://yoworld.com/?d=APLiving-" + homeId
+      : CANONICAL_BASE + homeId;
 
     outLink.value = canonical;
 
