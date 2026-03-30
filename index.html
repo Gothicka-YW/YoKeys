@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>YoKeys</title>
+    <meta
+      name="description"
+      content="Create and copy normalized YoWorld home links and forum BBCode."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-a" aria-hidden="true"></div>
+    <div class="bg-orb orb-b" aria-hidden="true"></div>
+
+    <main class="shell">
+      <section class="card">
+        <p class="kicker">GitHub Pages Widget</p>
+        <h1>YoKeys</h1>
+        <p class="sub">
+          Accept old or new input formats, then always output the canonical format.
+        </p>
+
+        <label for="home-input">Home ID or YoWorld URL</label>
+        <div class="row">
+          <input
+            id="home-input"
+            type="text"
+            placeholder="Example: 108837847 or https://yoworld.com/?d=h108837847"
+            autocomplete="off"
+          />
+          <button id="btn-normalize" class="btn btn-primary" type="button">Normalize</button>
+        </div>
+
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+
+        <label for="img-url">Optional image URL (for full signature code)</label>
+        <input
+          id="img-url"
+          type="url"
+          placeholder="https://i.ibb.co/example/signature.png"
+          autocomplete="off"
+        />
+
+        <div class="remember-wrap">
+          <input id="remember" type="checkbox" />
+          <label for="remember" class="remember-label">Remember my last Home ID</label>
+        </div>
+
+        <div class="outputs">
+          <div class="output-block">
+            <label for="out-link">Canonical Home Link</label>
+            <textarea id="out-link" rows="2" readonly></textarea>
+            <button id="copy-link" class="btn" type="button">Copy Link</button>
+          </div>
+
+          <div class="output-block">
+            <label for="out-bb">BBCode Wrapper</label>
+            <textarea id="out-bb" rows="2" readonly></textarea>
+            <button id="copy-bb" class="btn" type="button">Copy BBCode</button>
+          </div>
+
+          <div class="output-block">
+            <label for="out-signature">Full Signature BBCode</label>
+            <textarea id="out-signature" rows="3" readonly></textarea>
+            <button id="copy-signature" class="btn" type="button">Copy Signature</button>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="btn-clear" class="btn" type="button">Clear</button>
+        </div>
+
+        <p class="note">
+          Canonical output format: https://yoworld.com/?d=h&lt;HOME_ID&gt;
+        </p>
+      </section>
+    </main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
