@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Raven icon">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f6f1e8" />
+      <stop offset="1" stop-color="#e8d9c4" />
+    </linearGradient>
+    <linearGradient id="beak" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e98445" />
+      <stop offset="1" stop-color="#c95d1e" />
+    </linearGradient>
+  </defs>
+
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#bg)" />
+
+  <path
+    d="M12 37 C18 30, 25 27, 34 27 C43 27, 50 30, 54 36 C49 35, 44 36, 40 39 C36 42, 31 44, 26 44 C20 44, 15 42, 12 37 Z"
+    fill="#1f1b17"
+  />
+
+  <path
+    d="M22 22 C25 16, 34 14, 42 18 C36 18, 32 20, 30 23 C28 26, 25 28, 21 29 C21 26, 21 24, 22 22 Z"
+    fill="#1f1b17"
+  />
+
+  <path
+    d="M42 18 C49 18, 54 20, 57 24 C52 24, 48 25, 45 28 C43 30, 39 31, 35 30 C38 27, 40 23, 42 18 Z"
+    fill="url(#beak)"
+  />
+
+  <circle cx="36" cy="24" r="2.1" fill="#fff8ee" />
+  <circle cx="36.3" cy="23.8" r="1" fill="#1f1b17" />
+</svg>
