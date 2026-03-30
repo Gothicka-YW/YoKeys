@@ -2,7 +2,9 @@
   const KEY_ID = "yoworldHomeLinkMaker.homeId";
   const KEY_REMEMBER = "yoworldHomeLinkMaker.remember";
   const KEY_SAVED_KEYS = "yoworldHomeLinkMaker.savedKeys";
+  const KEY_FRIENDS_KEYS = "yoworldHomeLinkMaker.friendsKeys";
   const CANONICAL_BASE = "https://yoworld.com/?d=h";
+  const CURRENT_TAB_KEY = "yoworldHomeLinkMaker.currentTab";
 
   const homeInput = document.getElementById("home-input");
   const rememberInput = document.getElementById("remember");
@@ -17,6 +19,20 @@
   const btnCopyLink = document.getElementById("copy-link");
   const btnSaveKey = document.getElementById("btn-save-key");
   const btnClearSaved = document.getElementById("btn-clear-saved");
+
+  // Tab navigation elements
+  const tabMyKeys = document.getElementById("tab-my-keys");
+  const tabFriendsKeys = document.getElementById("tab-friends-keys");
+  const myKeysContent = document.getElementById("my-keys-content");
+  const friendsKeysContent = document.getElementById("friends-keys-content");
+  const friendStatusEl = document.getElementById("friend-status");
+
+  // Friends' Keys elements
+  const friendNameInput = document.getElementById("friend-name");
+  const friendLinkInput = document.getElementById("friend-link");
+  const friendsListEl = document.getElementById("friends-list");
+  const btnAddFriend = document.getElementById("btn-add-friend");
+  const btnClearFriends = document.getElementById("btn-clear-friends");
 
   function loadSavedKeys() {
     try {
@@ -194,6 +210,106 @@
     }
 
     renderSavedKeys();
+    renderFriendsKeys();
+    loadLastTab();
+  }
+
+  function loadFriendsKeys() {
+    try {
+      const raw = localStorage.getItem(KEY_FRIENDS_KEYS);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function persistFriendsKeys(friends) {
+    localStorage.setItem(KEY_FRIENDS_KEYS, JSON.stringify(friends));
+  }
+
+  function renderFriendsKeys() {
+    const friends = loadFriendsKeys();
+    friendsListEl.innerHTML = "";
+
+    if (!friends.length) {
+      const empty = document.createElement("li");
+      empty.className = "saved-empty";
+      empty.textContent = "No saved friends yet.";
+      friendsListEl.appendChild(empty);
+      return;
+    }
+
+    friends.forEach(function (entry) {
+      const item = document.createElement("li");
+      item.className = "saved-item";
+
+      const nameEl = document.createElement("p");
+      nameEl.className = "saved-item-name";
+      nameEl.textContent = entry.name;
+      item.appendChild(nameEl);
+
+      const linkEl = document.createElement("p");
+      linkEl.className = "saved-item-link";
+      linkEl.textContent = entry.url;
+      item.appendChild(linkEl);
+
+      const actions = document.createElement("div");
+      actions.className = "saved-item-actions";
+
+      const copyBtn = document.createElement("button");
+      copyBtn.type = "button";
+      copyBtn.className = "btn btn-small";
+      copyBtn.textContent = "Copy";
+      copyBtn.addEventListener("click", function () {
+        copyText(entry.url, entry.name + "'s link copied.");
+      });
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.type = "button";
+      deleteBtn.className = "btn btn-small";
+      deleteBtn.textContent = "Delete";
+      deleteBtn.addEventListener("click", function () {
+        const remaining = loadFriendsKeys().filter(function (f) {
+          return f.id !== entry.id;
+        });
+        persistFriendsKeys(remaining);
+        renderFriendsKeys();
+        setFriendStatus("Friend removed.", "ok");
+      });
+
+      actions.appendChild(copyBtn);
+      actions.appendChild(deleteBtn);
+      item.appendChild(actions);
+
+      friendsListEl.appendChild(item);
+    });
+  }
+
+  function setFriendStatus(message, type) {
+    friendStatusEl.textContent = message || "";
+    friendStatusEl.classList.remove("ok", "bad");
+    if (type) friendStatusEl.classList.add(type);
+  }
+
+  function switchTab(tabName) {
+    if (tabName === "my-keys") {
+      myKeysContent.classList.add("active");
+      friendsKeysContent.classList.remove("active");
+      tabMyKeys.classList.add("active");
+      tabFriendsKeys.classList.remove("active");
+    } else {
+      friendsKeysContent.classList.add("active");
+      myKeysContent.classList.remove("active");
+      tabFriendsKeys.classList.add("active");
+      tabMyKeys.classList.remove("active");
+    }
+    localStorage.setItem(CURRENT_TAB_KEY, tabName);
+  }
+
+  function loadLastTab() {
+    const lastTab = localStorage.getItem(CURRENT_TAB_KEY) || "my-keys";
+    switchTab(lastTab);
   }
 
   rememberInput.addEventListener("change", function () {
@@ -272,6 +388,79 @@
       localStorage.removeItem(KEY_ID);
     }
     homeInput.focus();
+  });
+
+  // Tab switching events
+  tabMyKeys.addEventListener("click", function () {
+    switchTab("my-keys");
+  });
+
+  tabFriendsKeys.addEventListener("click", function () {
+    switchTab("friends-keys");
+  });
+
+  // Friends' Keys events
+  btnAddFriend.addEventListener("click", function () {
+    const friendName = (friendNameInput.value || "").trim();
+    const friendLink = (friendLinkInput.value || "").trim();
+
+    if (!friendName) {
+      setFriendStatus("Please enter your friend's name.", "bad");
+      return;
+    }
+
+    if (!friendLink) {
+      setFriendStatus("Please enter your friend's home link.", "bad");
+      return;
+    }
+
+    // Validate the link can be parsed
+    const homeId = extractHomeId(friendLink);
+    if (!homeId) {
+      setFriendStatus("Invalid YoWorld home link.", "bad");
+      return;
+    }
+
+    const friends = loadFriendsKeys();
+    const duplicateName = friends.some(function (entry) {
+      return entry.name.toLowerCase() === friendName.toLowerCase();
+    });
+    if (duplicateName) {
+      setFriendStatus("A friend with that name is already saved.", "bad");
+      return;
+    }
+
+    friends.unshift({
+      id: Date.now() + "-" + Math.random().toString(36).slice(2, 8),
+      name: friendName,
+      url: friendLink,
+      createdAt: new Date().toISOString()
+    });
+
+    persistFriendsKeys(friends);
+    renderFriendsKeys();
+    setFriendStatus("Friend saved!", "ok");
+    friendNameInput.value = "";
+    friendLinkInput.value = "";
+    friendNameInput.focus();
+  });
+
+  friendLinkInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      btnAddFriend.click();
+    }
+  });
+
+  btnClearFriends.addEventListener("click", function () {
+    const friends = loadFriendsKeys();
+    if (!friends.length) {
+      setFriendStatus("No saved friends to clear.", "bad");
+      return;
+    }
+
+    localStorage.removeItem(KEY_FRIENDS_KEYS);
+    renderFriendsKeys();
+    setFriendStatus("All saved friends cleared.", "ok");
   });
 
   loadRemembered();

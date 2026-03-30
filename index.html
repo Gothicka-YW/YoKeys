@@ -24,11 +24,18 @@
       <section class="card">
         <p class="kicker">Gothicka's YoKeys Widget</p>
         <h1>YoKeys</h1>
-        <p class="sub">
-          Paste your home link in the box below to standardize your link for yoworld.com
-        </p>
 
-        <label for="home-input">Home ID or YoWorld URL</label>
+        <div class="tab-nav">
+          <button id="tab-my-keys" class="tab-btn active" type="button">My Keys</button>
+          <button id="tab-friends-keys" class="tab-btn" type="button">Friends' Keys</button>
+        </div>
+
+        <div id="my-keys-content" class="tab-content active">
+          <p class="sub">
+            Paste your home link in the box below to standardize your link for yoworld.com
+          </p>
+
+          <label for="home-input">Home ID or YoWorld URL</label>
         <div class="row">
           <input
             id="home-input"
@@ -81,6 +88,45 @@
         <p class="note">
           Canonical output format: https://yoworld.com/?d=h&lt;HOME_ID&gt;
         </p>
+        </div>
+
+        <div id="friends-keys-content" class="tab-content">
+          <p class="sub">
+            Save your friends' home links with their names so you can visit them anytime.
+          </p>
+
+          <label for="friend-name">Friend's Name</label>
+          <div class="row">
+            <input
+              id="friend-name"
+              type="text"
+              placeholder="Example: Pixie"
+              maxlength="60"
+              autocomplete="off"
+            />
+          </div>
+
+          <label for="friend-link">Friend's Home Link</label>
+          <div class="row">
+            <input
+              id="friend-link"
+              type="text"
+              placeholder="Example: https://yoworld.com/?d=h108837847"
+              autocomplete="off"
+            />
+            <button id="btn-add-friend" class="btn btn-primary" type="button">Save Friend</button>
+          </div>
+
+          <p id="friend-status" class="status" role="status" aria-live="polite"></p>
+
+          <div class="saved-keys">
+            <div class="saved-header-row">
+              <span class="saved-title">Saved Friends</span>
+              <button id="btn-clear-friends" class="btn btn-small" type="button">Clear All</button>
+            </div>
+            <ul id="friends-list" class="saved-list" aria-live="polite"></ul>
+          </div>
+        </div>
 
         <p class="privacy-note">
           Privacy Notice: YoKeys processes your input in your browser and only stores your last Home ID locally if you enable remember mode.

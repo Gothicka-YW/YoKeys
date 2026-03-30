@@ -26,9 +26,11 @@ If you enable the "Remember my last Home ID" option, YoKeys stores the last pars
 
 If you use the saved keys section, YoKeys also stores the names and normalized links you choose to save in localStorage.
 
-- Stored locally on your device/browser only
+If you use the Friends' Keys section, YoKeys stores your friends' names and their home links in localStorage.
+
+- All data stored locally on your device/browser only
 - Not transmitted to a server by YoKeys
-- You can clear it at any time by unchecking the remember option and/or clearing browser site data
+- You can clear it at any time by unchecking the remember option, clearing saved keys/friends, and/or clearing browser site data
 
 ## Data Collection and Sharing
 
