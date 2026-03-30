@@ -23,8 +23,10 @@
   // Tab navigation elements
   const tabMyKeys = document.getElementById("tab-my-keys");
   const tabFriendsKeys = document.getElementById("tab-friends-keys");
+  const tabSettings = document.getElementById("tab-settings");
   const myKeysContent = document.getElementById("my-keys-content");
   const friendsKeysContent = document.getElementById("friends-keys-content");
+  const settingsContent = document.getElementById("settings-content");
   const friendStatusEl = document.getElementById("friend-status");
 
   // Friends' Keys elements
@@ -33,6 +35,12 @@
   const friendsListEl = document.getElementById("friends-list");
   const btnAddFriend = document.getElementById("btn-add-friend");
   const btnClearFriends = document.getElementById("btn-clear-friends");
+
+  // Settings elements
+  const btnExport = document.getElementById("btn-export");
+  const btnImport = document.getElementById("btn-import");
+  const importFile = document.getElementById("import-file");
+  const importStatusEl = document.getElementById("import-status");
 
   function loadSavedKeys() {
     try {
@@ -292,17 +300,97 @@
     if (type) friendStatusEl.classList.add(type);
   }
 
+  function exportData() {
+    const keys = loadSavedKeys();
+    const friends = loadFriendsKeys();
+    
+    const data = {
+      version: "1.0",
+      exportedAt: new Date().toISOString(),
+      savedKeys: keys,
+      friendsKeys: friends
+    };
+    
+    const jsonString = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "YoKeys_backup_" + new Date().toISOString().slice(0, 10) + ".json";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    importStatusEl.textContent = "Backup exported successfully.";
+    importStatusEl.classList.remove("bad");
+    importStatusEl.classList.add("ok");
+  }
+
+  function importData() {
+    const file = importFile.files[0];
+    if (!file) {
+      importStatusEl.textContent = "Please select a JSON file.";
+      importStatusEl.classList.remove("ok");
+      importStatusEl.classList.add("bad");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      try {
+        const data = JSON.parse(e.target.result);
+        
+        if (!data.savedKeys || !data.friendsKeys) {
+          throw new Error("Invalid backup file format.");
+        }
+        
+        if (!Array.isArray(data.savedKeys) || !Array.isArray(data.friendsKeys)) {
+          throw new Error("Invalid backup file format.");
+        }
+        
+        // Restore data
+        persistSavedKeys(data.savedKeys);
+        persistFriendsKeys(data.friendsKeys);
+        
+        // Refresh UI
+        renderSavedKeys();
+        renderFriendsKeys();
+        
+        importStatusEl.textContent = "Data restored successfully. (" + data.savedKeys.length + " keys, " + data.friendsKeys.length + " friends)";
+        importStatusEl.classList.remove("bad");
+        importStatusEl.classList.add("ok");
+        
+        importFile.value = "";
+      } catch (err) {
+        importStatusEl.textContent = "Error importing file: " + (err.message || "Unknown error");
+        importStatusEl.classList.remove("ok");
+        importStatusEl.classList.add("bad");
+      }
+    };
+    
+    reader.readAsText(file);
+  }
+
   function switchTab(tabName) {
+    // Hide all tabs
+    myKeysContent.classList.remove("active");
+    friendsKeysContent.classList.remove("active");
+    settingsContent.classList.remove("active");
+    tabMyKeys.classList.remove("active");
+    tabFriendsKeys.classList.remove("active");
+    tabSettings.classList.remove("active");
+
+    // Show the selected tab
     if (tabName === "my-keys") {
       myKeysContent.classList.add("active");
-      friendsKeysContent.classList.remove("active");
       tabMyKeys.classList.add("active");
-      tabFriendsKeys.classList.remove("active");
-    } else {
+    } else if (tabName === "friends-keys") {
       friendsKeysContent.classList.add("active");
-      myKeysContent.classList.remove("active");
       tabFriendsKeys.classList.add("active");
-      tabMyKeys.classList.remove("active");
+    } else if (tabName === "settings") {
+      settingsContent.classList.add("active");
+      tabSettings.classList.add("active");
     }
     localStorage.setItem(CURRENT_TAB_KEY, tabName);
   }
@@ -399,6 +487,10 @@
     switchTab("friends-keys");
   });
 
+  tabSettings.addEventListener("click", function () {
+    switchTab("settings");
+  });
+
   // Friends' Keys events
   btnAddFriend.addEventListener("click", function () {
     const friendName = (friendNameInput.value || "").trim();
@@ -462,6 +554,10 @@
     renderFriendsKeys();
     setFriendStatus("All saved friends cleared.", "ok");
   });
+
+  // Settings events
+  btnExport.addEventListener("click", exportData);
+  btnImport.addEventListener("click", importData);
 
   loadRemembered();
 })();

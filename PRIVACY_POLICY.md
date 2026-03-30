@@ -31,6 +31,7 @@ If you use the Friends' Keys section, YoKeys stores your friends' names and thei
 - All data stored locally on your device/browser only
 - Not transmitted to a server by YoKeys
 - You can clear it at any time by unchecking the remember option, clearing saved keys/friends, and/or clearing browser site data
+- Use the Settings tab to export and import your data as JSON backups
 
 ## Data Collection and Sharing
 

@@ -378,3 +378,23 @@ textarea {
 .tab-content.active {
   display: block;
 }
+
+.settings-section {
+  margin-bottom: 24px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 252, 246, 0.85);
+}
+
+.settings-section h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.settings-desc {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--muted);
+}

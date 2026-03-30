@@ -28,6 +28,7 @@
         <div class="tab-nav">
           <button id="tab-my-keys" class="tab-btn active" type="button">My Keys</button>
           <button id="tab-friends-keys" class="tab-btn" type="button">Friends' Keys</button>
+          <button id="tab-settings" class="tab-btn" type="button">Settings</button>
         </div>
 
         <div id="my-keys-content" class="tab-content active">
@@ -125,6 +126,28 @@
               <button id="btn-clear-friends" class="btn btn-small" type="button">Clear All</button>
             </div>
             <ul id="friends-list" class="saved-list" aria-live="polite"></ul>
+          </div>
+        </div>
+
+        <div id="settings-content" class="tab-content">
+          <p class="sub">
+            Backup and restore your saved keys and friends.
+          </p>
+
+          <div class="settings-section">
+            <h3>Backup Your Data</h3>
+            <p class="settings-desc">Download all your saved keys and friends as a JSON file.</p>
+            <button id="btn-export" class="btn btn-primary" type="button">Export as JSON</button>
+          </div>
+
+          <div class="settings-section">
+            <h3>Restore Your Data</h3>
+            <p class="settings-desc">Upload a previously exported JSON file to restore your data.</p>
+            <div class="row">
+              <input id="import-file" type="file" accept=".json" />
+              <button id="btn-import" class="btn btn-primary" type="button">Import JSON</button>
+            </div>
+            <p id="import-status" class="status" role="status" aria-live="polite"></p>
           </div>
         </div>
 
