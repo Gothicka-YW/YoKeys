@@ -130,6 +130,10 @@
       // Not a full URL. Continue with pattern fallback.
     }
 
+    // Support links like d=APLiving-187985808 by taking digits after the hyphen.
+    const apLivingMatch = raw.match(/[?&]d=APLiving-(\d+)/i) || raw.match(/d=APLiving-(\d+)/i);
+    if (apLivingMatch && apLivingMatch[1]) return apLivingMatch[1];
+
     // Fallback for pasted fragments like d=h123456 or ...?d=h123456
     const queryMatch = raw.match(/[?&]d=h(\d+)/i) || raw.match(/d=h(\d+)/i);
     if (queryMatch && queryMatch[1]) return queryMatch[1];
