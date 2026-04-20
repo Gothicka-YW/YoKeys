@@ -112,12 +112,14 @@ label {
 }
 
 input,
+select,
 textarea,
 button {
   font: inherit;
 }
 
 input,
+select,
 textarea {
   width: 100%;
   border: 1px solid var(--line);
@@ -129,10 +131,31 @@ textarea {
 }
 
 input:focus,
+select:focus,
 textarea:focus {
   outline: none;
   border-color: var(--brand);
   box-shadow: 0 0 0 3px rgba(215, 111, 48, 0.2);
+}
+
+.type-row {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.type-label {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.type-select {
+  width: auto;
+  min-width: 170px;
 }
 
 textarea {
@@ -168,6 +191,22 @@ textarea {
   border-radius: 14px;
   padding: 10px;
   background: rgba(255, 252, 246, 0.8);
+}
+
+.output-block-primary {
+  background: rgba(255, 248, 236, 0.95);
+}
+
+.active-output {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px rgba(215, 111, 48, 0.15);
+}
+
+.output-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .saved-keys {
@@ -326,6 +365,10 @@ textarea {
   .card {
     padding: 18px;
     border-radius: 18px;
+  }
+
+  .type-select {
+    width: 100%;
   }
 
   .row {

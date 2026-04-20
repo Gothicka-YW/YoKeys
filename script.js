@@ -3,24 +3,23 @@
   const KEY_REMEMBER = "yoworldHomeLinkMaker.remember";
   const KEY_SAVED_KEYS = "yoworldHomeLinkMaker.savedKeys";
   const KEY_FRIENDS_KEYS = "yoworldHomeLinkMaker.friendsKeys";
-  const CANONICAL_BASE = "https://yoworld.com/?d=h";
+  const CANONICAL_BASE = "https://yoworld.com/?d=";
   const CURRENT_TAB_KEY = "yoworldHomeLinkMaker.currentTab";
 
   const homeInput = document.getElementById("home-input");
   const rememberInput = document.getElementById("remember");
   const statusEl = document.getElementById("status");
 
-  const outLink = document.getElementById("out-link");
+  const outLinkAll = document.getElementById("out-link-all");
   const keyNameInput = document.getElementById("key-name");
   const savedListEl = document.getElementById("saved-list");
 
   const btnNormalize = document.getElementById("btn-normalize");
   const btnClear = document.getElementById("btn-clear");
-  const btnCopyLink = document.getElementById("copy-link");
+  const btnCopyAllLinks = document.getElementById("copy-all-links");
   const btnSaveKey = document.getElementById("btn-save-key");
   const btnClearSaved = document.getElementById("btn-clear-saved");
 
-  // Tab navigation elements
   const tabMyKeys = document.getElementById("tab-my-keys");
   const tabFriendsKeys = document.getElementById("tab-friends-keys");
   const tabSettings = document.getElementById("tab-settings");
@@ -29,14 +28,13 @@
   const settingsContent = document.getElementById("settings-content");
   const friendStatusEl = document.getElementById("friend-status");
 
-  // Friends' Keys elements
   const friendNameInput = document.getElementById("friend-name");
   const friendLinkInput = document.getElementById("friend-link");
+  const friendTypeSelect = document.getElementById("friend-type");
   const friendsListEl = document.getElementById("friends-list");
   const btnAddFriend = document.getElementById("btn-add-friend");
   const btnClearFriends = document.getElementById("btn-clear-friends");
 
-  // Settings elements
   const btnExport = document.getElementById("btn-export");
   const btnImport = document.getElementById("btn-import");
   const importFile = document.getElementById("import-file");
@@ -54,6 +52,135 @@
 
   function persistSavedKeys(keys) {
     localStorage.setItem(KEY_SAVED_KEYS, JSON.stringify(keys));
+  }
+
+  function loadFriendsKeys() {
+    try {
+      const raw = localStorage.getItem(KEY_FRIENDS_KEYS);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function persistFriendsKeys(friends) {
+    localStorage.setItem(KEY_FRIENDS_KEYS, JSON.stringify(friends));
+  }
+
+  function setStatus(message, type) {
+    statusEl.textContent = message || "";
+    statusEl.classList.remove("ok", "bad");
+    if (type) statusEl.classList.add(type);
+  }
+
+  function setFriendStatus(message, type) {
+    friendStatusEl.textContent = message || "";
+    friendStatusEl.classList.remove("ok", "bad");
+    if (type) friendStatusEl.classList.add(type);
+  }
+
+  function clearOutputs() {
+    outLinkAll.value = "";
+  }
+
+  function isNumericOnlyInput(input) {
+    return /^\d+$/.test(String(input || "").trim());
+  }
+
+  function parseDestinationValue(value) {
+    const raw = String(value || "").trim();
+    if (!raw) return null;
+
+    const apartmentMatch = raw.match(/^APLiving-(\d+)$/i);
+    if (apartmentMatch && apartmentMatch[1]) {
+      return {
+        kind: "apartment",
+        id: apartmentMatch[1],
+        value: "APLiving-" + apartmentMatch[1]
+      };
+    }
+
+    const clubMatch = raw.match(/^(c\d+)$/i);
+    if (clubMatch && clubMatch[1]) {
+      return {
+        kind: "club",
+        id: clubMatch[1].slice(1),
+        value: clubMatch[1]
+      };
+    }
+
+    const standardMatch = raw.match(/^h(\d+)$/i);
+    if (standardMatch && standardMatch[1]) {
+      return {
+        kind: "standard",
+        id: standardMatch[1],
+        value: "h" + standardMatch[1]
+      };
+    }
+
+    return null;
+  }
+
+  function buildDestinationFromDigits(digits, selectedType) {
+    if (!digits) return null;
+
+    if (selectedType === "apartment") {
+      return {
+        kind: "apartment",
+        id: digits,
+        value: "APLiving-" + digits
+      };
+    }
+
+    return {
+      kind: "standard",
+      id: digits,
+      value: "h" + digits
+    };
+  }
+
+  function parseInputDestination(input, selectedType) {
+    const raw = String(input || "").trim();
+    if (!raw) return null;
+
+    if (/^\d+$/.test(raw)) return buildDestinationFromDigits(raw, selectedType);
+
+    const directValue = parseDestinationValue(raw);
+    if (directValue) return directValue;
+
+    try {
+      const parsed = new URL(raw);
+      const dValue = parsed.searchParams.get("d");
+      if (dValue) {
+        const fromParam = parseDestinationValue(dValue);
+        if (fromParam) return fromParam;
+      }
+    } catch (err) {
+      // Not a full URL. Continue with pattern fallback.
+    }
+
+    const apLivingMatch = raw.match(/[?&]d=(APLiving-\d+)/i) || raw.match(/d=(APLiving-\d+)/i);
+    if (apLivingMatch && apLivingMatch[1]) return parseDestinationValue(apLivingMatch[1]);
+
+    const clubMatch = raw.match(/[?&]d=(c\d+)/i) || raw.match(/d=(c\d+)/i);
+    if (clubMatch && clubMatch[1]) return parseDestinationValue(clubMatch[1]);
+
+    const standardMatch = raw.match(/[?&]d=(h\d+)/i) || raw.match(/d=(h\d+)/i);
+    if (standardMatch && standardMatch[1]) return parseDestinationValue(standardMatch[1]);
+
+    const fallbackApartment = raw.match(/APLiving-\d+/i);
+    if (fallbackApartment) return parseDestinationValue(fallbackApartment[0]);
+
+    const fallbackClub = raw.match(/c\d+/i);
+    if (fallbackClub) return parseDestinationValue(fallbackClub[0]);
+
+    const fallbackStandard = raw.match(/h\d+/i);
+    return fallbackStandard ? parseDestinationValue(fallbackStandard[0]) : null;
+  }
+
+  function buildCanonicalUrl(destination) {
+    return CANONICAL_BASE + destination.value;
   }
 
   function renderSavedKeys() {
@@ -91,7 +218,7 @@
       loadBtn.textContent = "Load";
       loadBtn.addEventListener("click", function () {
         homeInput.value = entry.url;
-        outLink.value = entry.url;
+        buildOutputs();
         keyNameInput.value = entry.name;
         setStatus("Loaded saved key.", "ok");
       });
@@ -109,8 +236,8 @@
       deleteBtn.className = "btn btn-small";
       deleteBtn.textContent = "Delete";
       deleteBtn.addEventListener("click", function () {
-        const remaining = loadSavedKeys().filter(function (k) {
-          return k.id !== entry.id;
+        const remaining = loadSavedKeys().filter(function (keyEntry) {
+          return keyEntry.id !== entry.id;
         });
         persistSavedKeys(remaining);
         renderSavedKeys();
@@ -124,123 +251,6 @@
 
       savedListEl.appendChild(item);
     });
-  }
-
-  function setStatus(message, type) {
-    statusEl.textContent = message || "";
-    statusEl.classList.remove("ok", "bad");
-    if (type) statusEl.classList.add(type);
-  }
-
-  function clearOutputs() {
-    outLink.value = "";
-  }
-
-  function extractHomeId(input) {
-    const raw = String(input || "").trim();
-    if (!raw) return null;
-
-    if (/^\d+$/.test(raw)) return raw;
-
-    // Parse URL-like input and extract digits immediately after leading "h" in d=...
-    try {
-      const parsed = new URL(raw);
-      const dValue = parsed.searchParams.get("d");
-      if (dValue) {
-        const fromParam = dValue.match(/^h(\d+)/i);
-        if (fromParam && fromParam[1]) return fromParam[1];
-      }
-    } catch (err) {
-      // Not a full URL. Continue with pattern fallback.
-    }
-
-    // Support links like d=APLiving-187985808 by taking digits after the hyphen.
-    const apLivingMatch = raw.match(/[?&]d=APLiving-(\d+)/i) || raw.match(/d=APLiving-(\d+)/i);
-    if (apLivingMatch && apLivingMatch[1]) return apLivingMatch[1];
-
-    // Support links like d=c6065990 (club rooms)
-    const cMatch = raw.match(/[?&]d=(c\d+)/i) || raw.match(/d=(c\d+)/i);
-    if (cMatch && cMatch[1]) return cMatch[1];
-
-    // Fallback for pasted fragments like d=h123456 or ...?d=h123456
-    const queryMatch = raw.match(/[?&]d=h(\d+)/i) || raw.match(/d=h(\d+)/i);
-    if (queryMatch && queryMatch[1]) return queryMatch[1];
-
-    // Final fallback: pull digits immediately after "h" anywhere in the input.
-    const hMatch = raw.match(/h(\d+)/i);
-    return hMatch ? hMatch[1] : null;
-  }
-
-  function buildOutputs() {
-    const homeId = extractHomeId(homeInput.value);
-    if (!homeId) {
-      clearOutputs();
-      setStatus("Please enter a valid Home ID or YoWorld home URL.", "bad");
-      return;
-    }
-
-    // Check if input contains APLiving format to use correct prefix
-    const input = homeInput.value.trim();
-    const isAPLiving = /d=APLiving-/i.test(input);
-    const isClub = /d=c\d+/i.test(input);
-    
-    const canonical = isAPLiving 
-      ? "https://yoworld.com/?d=APLiving-" + homeId
-      : isClub
-      ? "https://yoworld.com/?d=" + homeId
-      : CANONICAL_BASE + homeId;
-
-    outLink.value = canonical;
-
-    if (rememberInput.checked) {
-      localStorage.setItem(KEY_ID, homeId);
-    }
-
-    setStatus("Link normalized to the new format.", "ok");
-  }
-
-  async function copyText(value, successMessage) {
-    if (!value) {
-      setStatus("Nothing to copy yet.", "bad");
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(value);
-      setStatus(successMessage, "ok");
-    } catch (err) {
-      setStatus("Clipboard blocked. You can select and copy manually.", "bad");
-    }
-  }
-
-  function loadRemembered() {
-    const remember = localStorage.getItem(KEY_REMEMBER) === "1";
-    rememberInput.checked = remember;
-
-    if (remember) {
-      const savedId = localStorage.getItem(KEY_ID);
-      if (savedId) {
-        homeInput.value = savedId;
-        buildOutputs();
-      }
-    }
-
-    renderSavedKeys();
-    renderFriendsKeys();
-    loadLastTab();
-  }
-
-  function loadFriendsKeys() {
-    try {
-      const raw = localStorage.getItem(KEY_FRIENDS_KEYS);
-      const parsed = raw ? JSON.parse(raw) : [];
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (err) {
-      return [];
-    }
-  }
-
-  function persistFriendsKeys(friends) {
-    localStorage.setItem(KEY_FRIENDS_KEYS, JSON.stringify(friends));
   }
 
   function renderFriendsKeys() {
@@ -285,8 +295,8 @@
       deleteBtn.className = "btn btn-small";
       deleteBtn.textContent = "Delete";
       deleteBtn.addEventListener("click", function () {
-        const remaining = loadFriendsKeys().filter(function (f) {
-          return f.id !== entry.id;
+        const remaining = loadFriendsKeys().filter(function (friendEntry) {
+          return friendEntry.id !== entry.id;
         });
         persistFriendsKeys(remaining);
         renderFriendsKeys();
@@ -301,23 +311,66 @@
     });
   }
 
-  function setFriendStatus(message, type) {
-    friendStatusEl.textContent = message || "";
-    friendStatusEl.classList.remove("ok", "bad");
-    if (type) friendStatusEl.classList.add(type);
+  function buildOutputs() {
+    const rawInput = String(homeInput.value || "").trim();
+    if (!rawInput) {
+      clearOutputs();
+      setStatus("Please enter a valid room ID, apartment ID, or YoWorld/Facebook link.", "bad");
+      return;
+    }
+
+    if (isNumericOnlyInput(rawInput)) {
+      outLinkAll.value = CANONICAL_BASE + "APLiving-" + rawInput;
+
+      if (rememberInput.checked) {
+        localStorage.setItem(KEY_ID, rawInput);
+      }
+
+      setStatus("Apartment link generated from numeric ID.", "ok");
+      return;
+    }
+
+    const destination = parseInputDestination(rawInput, "apartment");
+    if (!destination) {
+      clearOutputs();
+      setStatus("Please enter a valid room ID, apartment ID, or YoWorld/Facebook link.", "bad");
+      return;
+    }
+
+    outLinkAll.value = buildCanonicalUrl(destination);
+
+    if (rememberInput.checked) {
+      localStorage.setItem(KEY_ID, rawInput);
+    }
+
+    setStatus("Link normalized to the new format.", "ok");
+  }
+
+  async function copyText(value, successMessage) {
+    if (!value) {
+      setStatus("Nothing to copy yet.", "bad");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(value);
+      setStatus(successMessage, "ok");
+    } catch (err) {
+      setStatus("Clipboard blocked. You can select and copy manually.", "bad");
+    }
   }
 
   function exportData() {
     const keys = loadSavedKeys();
     const friends = loadFriendsKeys();
-    
+
     const data = {
       version: "1.0",
       exportedAt: new Date().toISOString(),
       savedKeys: keys,
       friendsKeys: friends
     };
-    
+
     const jsonString = JSON.stringify(data, null, 2);
     const blob = new Blob([jsonString], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -328,7 +381,7 @@
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    
+
     importStatusEl.textContent = "Backup exported successfully.";
     importStatusEl.classList.remove("bad");
     importStatusEl.classList.add("ok");
@@ -347,27 +400,24 @@
     reader.onload = function (e) {
       try {
         const data = JSON.parse(e.target.result);
-        
+
         if (!data.savedKeys || !data.friendsKeys) {
           throw new Error("Invalid backup file format.");
         }
-        
+
         if (!Array.isArray(data.savedKeys) || !Array.isArray(data.friendsKeys)) {
           throw new Error("Invalid backup file format.");
         }
-        
-        // Restore data
+
         persistSavedKeys(data.savedKeys);
         persistFriendsKeys(data.friendsKeys);
-        
-        // Refresh UI
         renderSavedKeys();
         renderFriendsKeys();
-        
+
         importStatusEl.textContent = "Data restored successfully. (" + data.savedKeys.length + " keys, " + data.friendsKeys.length + " friends)";
         importStatusEl.classList.remove("bad");
         importStatusEl.classList.add("ok");
-        
+
         importFile.value = "";
       } catch (err) {
         importStatusEl.textContent = "Error importing file: " + (err.message || "Unknown error");
@@ -375,12 +425,11 @@
         importStatusEl.classList.add("bad");
       }
     };
-    
+
     reader.readAsText(file);
   }
 
   function switchTab(tabName) {
-    // Hide all tabs
     myKeysContent.classList.remove("active");
     friendsKeysContent.classList.remove("active");
     settingsContent.classList.remove("active");
@@ -388,7 +437,6 @@
     tabFriendsKeys.classList.remove("active");
     tabSettings.classList.remove("active");
 
-    // Show the selected tab
     if (tabName === "my-keys") {
       myKeysContent.classList.add("active");
       tabMyKeys.classList.add("active");
@@ -399,6 +447,7 @@
       settingsContent.classList.add("active");
       tabSettings.classList.add("active");
     }
+
     localStorage.setItem(CURRENT_TAB_KEY, tabName);
   }
 
@@ -407,11 +456,30 @@
     switchTab(lastTab);
   }
 
+  function loadRemembered() {
+    const remember = localStorage.getItem(KEY_REMEMBER) === "1";
+    rememberInput.checked = remember;
+
+    if (remember) {
+      const savedId = localStorage.getItem(KEY_ID);
+      if (savedId) {
+        homeInput.value = savedId;
+        buildOutputs();
+      }
+    }
+
+    renderSavedKeys();
+    renderFriendsKeys();
+    loadLastTab();
+  }
+
   rememberInput.addEventListener("change", function () {
     if (rememberInput.checked) {
       localStorage.setItem(KEY_REMEMBER, "1");
-      const id = extractHomeId(homeInput.value);
-      if (id) localStorage.setItem(KEY_ID, id);
+      const rawInput = String(homeInput.value || "").trim();
+      if (rawInput) {
+        localStorage.setItem(KEY_ID, rawInput);
+      }
     } else {
       localStorage.removeItem(KEY_REMEMBER);
       localStorage.removeItem(KEY_ID);
@@ -423,16 +491,16 @@
     if (e.key === "Enter") buildOutputs();
   });
 
-  btnCopyLink.addEventListener("click", function () {
-    copyText(outLink.value, "Canonical link copied.");
+  btnCopyAllLinks.addEventListener("click", function () {
+    copyText(outLinkAll.value, "Link copied.");
   });
 
   btnSaveKey.addEventListener("click", function () {
-    const normalized = (outLink.value || "").trim();
+    const normalized = (outLinkAll.value || "").trim();
     const name = (keyNameInput.value || "").trim();
 
     if (!normalized) {
-      setStatus("Normalize a link first before saving.", "bad");
+      setStatus("Generate a link first before saving.", "bad");
       return;
     }
     if (!name) {
@@ -485,7 +553,6 @@
     homeInput.focus();
   });
 
-  // Tab switching events
   tabMyKeys.addEventListener("click", function () {
     switchTab("my-keys");
   });
@@ -498,7 +565,6 @@
     switchTab("settings");
   });
 
-  // Friends' Keys events
   btnAddFriend.addEventListener("click", function () {
     const friendName = (friendNameInput.value || "").trim();
     const friendLink = (friendLinkInput.value || "").trim();
@@ -513,9 +579,8 @@
       return;
     }
 
-    // Validate the link can be parsed
-    const homeId = extractHomeId(friendLink);
-    if (!homeId) {
+    const destination = parseInputDestination(friendLink, friendTypeSelect && friendTypeSelect.value === "apartment" ? "apartment" : "standard");
+    if (!destination) {
       setFriendStatus("Invalid YoWorld home link.", "bad");
       return;
     }
@@ -528,11 +593,10 @@
       setFriendStatus("A friend with that name is already saved.", "bad");
       return;
     }
-
     friends.unshift({
       id: Date.now() + "-" + Math.random().toString(36).slice(2, 8),
       name: friendName,
-      url: friendLink,
+      url: buildCanonicalUrl(destination),
       createdAt: new Date().toISOString()
     });
 
@@ -562,7 +626,6 @@
     setFriendStatus("All saved friends cleared.", "ok");
   });
 
-  // Settings events
   btnExport.addEventListener("click", exportData);
   btnImport.addEventListener("click", importData);
 

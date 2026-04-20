@@ -36,15 +36,15 @@
 
         <div id="my-keys-content" class="tab-content active">
           <p class="sub">
-            Paste your home link in the box below to standardize your link for yoworld.com
+            Paste your YoWorld or Facebook link below. If you paste only numbers, YoKeys will default to the apartment link format.
           </p>
 
-          <label for="home-input">Facebook URL or YoWorld URL</label>
+          <label for="home-input">Facebook URL, YoWorld URL, or ID</label>
         <div class="row">
           <input
             id="home-input"
             type="text"
-            placeholder="Example: 108837847 or https://apps.facebook.com/playyoworld/?d=h108837847"
+            placeholder="Example: 108837847 or https://apps.facebook.com/playyoworld/?d=APLiving-187898876"
             autocomplete="off"
           />
           <button id="btn-normalize" class="btn btn-primary" type="button">Get Home Link</button>
@@ -58,10 +58,10 @@
         </div>
 
         <div class="outputs">
-          <div class="output-block">
-            <label for="out-link">Here are your keys!</label>
-            <textarea id="out-link" rows="2" readonly></textarea>
-            <button id="copy-link" class="btn" type="button">Copy Link</button>
+          <div class="output-block output-block-primary">
+            <label for="out-link-all">Here are your keys!</label>
+            <textarea id="out-link-all" rows="3" readonly></textarea>
+            <button id="copy-all-links" class="btn" type="button">Copy Link</button>
           </div>
         </div>
 
@@ -90,7 +90,7 @@
         </div>
 
         <p class="note">
-          Canonical output format: https://yoworld.com/?d=h&lt;HOME_ID&gt;
+          If you paste numbers only, YoKeys now defaults to the apartment format: https://yoworld.com/?d=APLiving-&lt;HOME_ID&gt;.
         </p>
         </div>
 
@@ -110,15 +110,23 @@
             />
           </div>
 
-          <label for="friend-link">Friend's Home Link</label>
+          <label for="friend-link">Friend's Home Link or ID</label>
           <div class="row">
             <input
               id="friend-link"
               type="text"
-              placeholder="Example: https://yoworld.com/?d=h108837847"
+              placeholder="Example: 187898876 or https://yoworld.com/?d=APLiving-187898876"
               autocomplete="off"
             />
             <button id="btn-add-friend" class="btn btn-primary" type="button">Save Friend</button>
+          </div>
+
+          <div class="type-row">
+            <label for="friend-type" class="type-label">If you paste only numbers</label>
+            <select id="friend-type" class="type-select">
+              <option value="standard">Standard Room</option>
+              <option value="apartment">Apartment</option>
+            </select>
           </div>
 
           <p id="friend-status" class="status" role="status" aria-live="polite"></p>

@@ -4,15 +4,19 @@ Standalone web widget that normalizes YoWorld home links.
 
 ## Canonical Output
 
-The widget always outputs:
+The widget outputs one of these canonical formats:
 
 https://yoworld.com/?d=hHOME_ID
 
+https://yoworld.com/?d=APLiving-HOME_ID
+
 ## Features
 
-- Accepts Home ID only, old `index.php?d=h...`, or new `?d=h...` URLs.
+- Accepts standard room IDs, apartment IDs, old `index.php?d=h...`, or new `?d=...` URLs.
 - Accepts legacy Facebook layout links like `https://apps.facebook.com/playyoworld/?d=h108837847`.
-- Normalizes to a single canonical link format.
+- Accepts apartment links like `https://apps.facebook.com/playyoworld/?d=APLiving-187898876`.
+- Defaults numeric-only input to the apartment link format (`APLiving-...`).
+- Normalizes to the matching canonical YoWorld link format.
 - Shows one canonical output labeled **Here are your keys!**
 - Includes one-click copy for the canonical link.
 - Optional remember-last-ID toggle using localStorage.
