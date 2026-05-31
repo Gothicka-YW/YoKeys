@@ -92,12 +92,12 @@
     const raw = String(value || "").trim();
     if (!raw) return null;
 
-    const apartmentMatch = raw.match(/^APLiving-(\d+)$/i);
-    if (apartmentMatch && apartmentMatch[1]) {
+    const apartmentMatch = raw.match(/^(AP[A-Za-z0-9]+)-(\d+)$/i);
+    if (apartmentMatch && apartmentMatch[1] && apartmentMatch[2]) {
       return {
         kind: "apartment",
-        id: apartmentMatch[1],
-        value: "APLiving-" + apartmentMatch[1]
+        id: apartmentMatch[2],
+        value: apartmentMatch[1] + "-" + apartmentMatch[2]
       };
     }
 
@@ -160,8 +160,8 @@
       // Not a full URL. Continue with pattern fallback.
     }
 
-    const apLivingMatch = raw.match(/[?&]d=(APLiving-\d+)/i) || raw.match(/d=(APLiving-\d+)/i);
-    if (apLivingMatch && apLivingMatch[1]) return parseDestinationValue(apLivingMatch[1]);
+    const apartmentMatch = raw.match(/[?&]d=(AP[A-Za-z0-9]+-\d+)/i) || raw.match(/d=(AP[A-Za-z0-9]+-\d+)/i);
+    if (apartmentMatch && apartmentMatch[1]) return parseDestinationValue(apartmentMatch[1]);
 
     const clubMatch = raw.match(/[?&]d=(c\d+)/i) || raw.match(/d=(c\d+)/i);
     if (clubMatch && clubMatch[1]) return parseDestinationValue(clubMatch[1]);
@@ -169,7 +169,7 @@
     const standardMatch = raw.match(/[?&]d=(h\d+)/i) || raw.match(/d=(h\d+)/i);
     if (standardMatch && standardMatch[1]) return parseDestinationValue(standardMatch[1]);
 
-    const fallbackApartment = raw.match(/APLiving-\d+/i);
+    const fallbackApartment = raw.match(/AP[A-Za-z0-9]+-\d+/i);
     if (fallbackApartment) return parseDestinationValue(fallbackApartment[0]);
 
     const fallbackClub = raw.match(/c\d+/i);
