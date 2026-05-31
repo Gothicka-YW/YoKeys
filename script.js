@@ -364,6 +364,18 @@
     }
   }
 
+  function shouldConfirmDuplicate(options) {
+    const duplicates = [];
+    if (options.duplicateName) duplicates.push("name");
+    if (options.duplicateLink) duplicates.push("link");
+    if (!duplicates.length) return true;
+
+    const duplicateText = duplicates.join(" and ");
+    return window.confirm(
+      "A " + options.label + " with the same " + duplicateText + " already exists. Save anyway?"
+    );
+  }
+
   function exportData() {
     const keys = loadSavedKeys();
     const friends = loadFriendsKeys();
@@ -516,8 +528,16 @@
     const duplicateName = keys.some(function (entry) {
       return entry.name.toLowerCase() === name.toLowerCase();
     });
-    if (duplicateName) {
-      setStatus("A saved key with that name already exists.", "bad");
+    const duplicateLink = keys.some(function (entry) {
+      return String(entry.url || "").toLowerCase() === normalized.toLowerCase();
+    });
+    const shouldSave = shouldConfirmDuplicate({
+      duplicateName: duplicateName,
+      duplicateLink: duplicateLink,
+      label: "saved key"
+    });
+    if (!shouldSave) {
+      setStatus("Save canceled.", "bad");
       return;
     }
 
@@ -593,14 +613,23 @@
     const duplicateName = friends.some(function (entry) {
       return entry.name.toLowerCase() === friendName.toLowerCase();
     });
-    if (duplicateName) {
-      setFriendStatus("A friend with that name is already saved.", "bad");
+    const canonicalUrl = buildCanonicalUrl(destination);
+    const duplicateLink = friends.some(function (entry) {
+      return String(entry.url || "").toLowerCase() === canonicalUrl.toLowerCase();
+    });
+    const shouldSave = shouldConfirmDuplicate({
+      duplicateName: duplicateName,
+      duplicateLink: duplicateLink,
+      label: "friend"
+    });
+    if (!shouldSave) {
+      setFriendStatus("Save canceled.", "bad");
       return;
     }
     friends.unshift({
       id: Date.now() + "-" + Math.random().toString(36).slice(2, 8),
       name: friendName,
-      url: buildCanonicalUrl(destination),
+      url: canonicalUrl,
       createdAt: new Date().toISOString()
     });
 
