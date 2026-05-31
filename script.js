@@ -265,6 +265,10 @@
       return;
     }
 
+    friends.sort(function (a, b) {
+      return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+    });
+
     friends.forEach(function (entry) {
       const item = document.createElement("li");
       item.className = "saved-item";
