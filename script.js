@@ -17,6 +17,7 @@
   const btnNormalize = document.getElementById("btn-normalize");
   const btnClear = document.getElementById("btn-clear");
   const btnCopyAllLinks = document.getElementById("copy-all-links");
+  const btnLaunchLink = document.getElementById("launch-link");
   const btnSaveKey = document.getElementById("btn-save-key");
   const btnClearSaved = document.getElementById("btn-clear-saved");
 
@@ -231,6 +232,14 @@
         copyText(entry.url, "Saved key copied.");
       });
 
+      const launchBtn = document.createElement("button");
+      launchBtn.type = "button";
+      launchBtn.className = "btn btn-small";
+      launchBtn.textContent = "Launch";
+      launchBtn.addEventListener("click", function () {
+        launchUrl(entry.url, "Launching home...");
+      });
+
       const deleteBtn = document.createElement("button");
       deleteBtn.type = "button";
       deleteBtn.className = "btn btn-small";
@@ -246,6 +255,7 @@
 
       actions.appendChild(loadBtn);
       actions.appendChild(copyBtn);
+      actions.appendChild(launchBtn);
       actions.appendChild(deleteBtn);
       item.appendChild(actions);
 
@@ -294,6 +304,14 @@
         copyText(entry.url, entry.name + "'s link copied.");
       });
 
+      const launchBtn = document.createElement("button");
+      launchBtn.type = "button";
+      launchBtn.className = "btn btn-small";
+      launchBtn.textContent = "Launch";
+      launchBtn.addEventListener("click", function () {
+        launchUrl(entry.url, "Visiting " + entry.name + "...");
+      });
+
       const deleteBtn = document.createElement("button");
       deleteBtn.type = "button";
       deleteBtn.className = "btn btn-small";
@@ -308,6 +326,7 @@
       });
 
       actions.appendChild(copyBtn);
+      actions.appendChild(launchBtn);
       actions.appendChild(deleteBtn);
       item.appendChild(actions);
 
@@ -361,6 +380,22 @@
       setStatus(successMessage, "ok");
     } catch (err) {
       setStatus("Clipboard blocked. You can select and copy manually.", "bad");
+    }
+  }
+
+  function launchUrl(url, successMessage) {
+    if (!url) {
+      setStatus("Nothing to launch yet.", "bad");
+      return;
+    }
+
+    try {
+      window.open(url, "_blank", "noopener,noreferrer");
+      if (successMessage) {
+        setStatus(successMessage, "ok");
+      }
+    } catch (err) {
+      setStatus("Unable to launch link.", "bad");
     }
   }
 
@@ -509,6 +544,10 @@
 
   btnCopyAllLinks.addEventListener("click", function () {
     copyText(outLinkAll.value, "Link copied.");
+  });
+
+  btnLaunchLink.addEventListener("click", function () {
+    launchUrl(outLinkAll.value, "Launching home...");
   });
 
   btnSaveKey.addEventListener("click", function () {
